@@ -102,3 +102,21 @@ while True:
 ## More
 
 If you find EyeTrax useful, consider starring the repo or contributing. If you use it in your research, please cite it. The project is available under the MIT license.
+
+**BibTeX**
+```
+@software{Zhang2025_EyeTrax,
+  author       = {Chenkai Zhang},
+  title        = {EyeTrax},
+  version      = {0.2.2},
+  date         = {2025-04-23},
+  url          = {https://pypi.org/project/eyetrax/},
+  repository   = {https://github.com/ck-zhang/EyeTrax},
+  keywords     = {eye tracking, computer vision}
+}
+```
+
+**APA style**
+```
+Zhang, C. (2025). EyeTrax (0.2.2) [Computer software]. https://pypi.org/project/eyetrax/ 
+```
