@@ -1,5 +1,6 @@
 # EyeTrax
 
+[![DOI](https://zenodo.org/badge/DOI/10.5281/zenodo.17188537.svg)](https://doi.org/10.5281/zenodo.17188537)
 [![PyPI version](https://img.shields.io/pypi/v/eyetrax.svg)](https://pypi.org/project/eyetrax/)
 ![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)
 ![made-with-python](https://img.shields.io/badge/Made%20with-Python-1f425f.svg)
@@ -104,7 +105,7 @@ while True:
 If you find EyeTrax useful, consider starring the repo or contributing. If you use it in your research, please cite it. The project is available under the MIT license.
 
 **BibTeX**
-```
+```bibtex
 @software{Zhang2025_EyeTrax,
   author       = {Chenkai Zhang},
   title        = {EyeTrax},
@@ -112,11 +113,12 @@ If you find EyeTrax useful, consider starring the repo or contributing. If you u
   date         = {2025-04-23},
   url          = {https://pypi.org/project/eyetrax/},
   repository   = {https://github.com/ck-zhang/EyeTrax},
+  doi          = {10.5281/zenodo.17188537},
   keywords     = {eye tracking, computer vision}
 }
 ```
 
 **APA style**
 ```
-Zhang, C. (2025). EyeTrax (0.2.2) [Computer software]. https://pypi.org/project/eyetrax/ 
+Zhang, C. (2025). EyeTrax (0.2.2) [Computer software]. Zenodo. https://doi.org/10.5281/zenodo.17188537
 ```
