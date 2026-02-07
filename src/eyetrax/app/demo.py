@@ -7,6 +7,7 @@ import numpy as np
 from eyetrax.calibration import (
     run_5_point_calibration,
     run_9_point_calibration,
+    run_dense_grid_calibration,
     run_lissajous_calibration,
 )
 from eyetrax.cli import parse_common_args
@@ -37,6 +38,12 @@ def run_demo():
             run_9_point_calibration(gaze_estimator, camera_index=camera_index)
         elif calibration_method == "5p":
             run_5_point_calibration(gaze_estimator, camera_index=camera_index)
+        elif calibration_method == "dense":
+            run_dense_grid_calibration(gaze_estimator,
+                                       rows = args.grid_rows,
+                                       cols = args.grid_cols,
+                                       margin_ratio = args.grid_margin,
+                                       camera_index = camera_index)
         else:
             run_lissajous_calibration(gaze_estimator, camera_index=camera_index)
 
