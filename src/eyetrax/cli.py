@@ -19,9 +19,27 @@ def parse_common_args():
     )
     parser.add_argument(
         "--calibration",
-        choices=["9p", "5p", "lissajous"],
+        choices=["9p", "5p", "lissajous", "dense"],
         default="9p",
-        help="Calibration method for gaze estimation, options are '9p', '5p', or 'lissajous'",
+        help="Calibration method for gaze estimation, options are '9p', '5p', or 'lissajous', or 'dense'",
+    )
+    parser.add_argument(
+        "--grid-rows",
+        type = int,
+        default = 5,
+        help = "Number of rows for dense grid calibration (default 5)",
+    )
+    parser.add_argument(
+        "--grid-cols",
+        type = int,
+        default = 5,
+        help = "Number of columns for dense grid calibration ( default 5) "
+    )
+    parser.add_argument(
+        "--grid_margin",
+        type = float,
+        default = 0.10,
+        help = "Margin ratio for dense grid calibration (default 0.10 =10%)"
     )
     parser.add_argument(
         "--background",
