@@ -7,7 +7,7 @@ def parse_common_args():
 
     parser.add_argument(
         "--filter",
-        choices=["kalman", "kde", "none"],
+        choices=["kalman", "kde", "none", "kalman_ema"],
         default="none",
         help="Select the filter to apply to gaze estimation, options are 'kalman', 'kde', or 'none'",
     )
@@ -45,6 +45,12 @@ def parse_common_args():
         type=str,
         default=None,
         help="Path to a previously-trained gaze model",
+    )
+    parser.add_argument(
+        "--ema-alpha",
+        type=float,
+        default=0.25,
+        help="Exponential Moving Average Alpha value",
     )
 
     return parser.parse_args()
