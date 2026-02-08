@@ -22,7 +22,6 @@ def main():
     print("Running 9 point calibration....")
     print("Look at each point as it appears on screen")
     run_5_point_calibration(gaze_est, camera_index = 0)
-
     #2 filters to compare
     kalman = KalmanSmoother()
     kalman_ema = KalmanEMASmoother(ema_alpha = 0.5)
@@ -35,6 +34,7 @@ def main():
         print("Error: couldn't open camera")
         return
     cap.set(cv2.CAP_PROP_BUFFERSIZE, 1) # minimize buffer
+
     print("Comparing Kalman vs Kalman+EMA ( a = 0.5 )")
     print("Press 'q' to quit")
     print()
@@ -91,7 +91,6 @@ def main():
         if key == ord('q'):
             print("\n Quitting")
             return
-
     cap.release()
     cv2.destroyAllWindows()
 

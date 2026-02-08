@@ -1,5 +1,6 @@
 # EyeTrax
 
+[![DOI](https://zenodo.org/badge/DOI/10.5281/zenodo.17188537.svg)](https://doi.org/10.5281/zenodo.17188537)
 [![PyPI version](https://img.shields.io/pypi/v/eyetrax.svg)](https://pypi.org/project/eyetrax/)
 ![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)
 ![made-with-python](https://img.shields.io/badge/Made%20with-Python-1f425f.svg)
@@ -9,6 +10,7 @@
 
 EyeTrax is a Python library that provides **webcam-based eye tracking**.
 Extract facial features, train a model and predict gaze with an easy‑to‑use interface.
+
 
 ## Features
 
@@ -113,7 +115,7 @@ while True:
 If you find EyeTrax useful, consider starring the repo or contributing. If you use it in your research, please cite it. The project is available under the MIT license.
 
 **BibTeX**
-```
+```bibtex
 @software{Zhang2025_EyeTrax,
   author       = {Chenkai Zhang},
   title        = {EyeTrax},
@@ -121,11 +123,39 @@ If you find EyeTrax useful, consider starring the repo or contributing. If you u
   date         = {2025-04-23},
   url          = {https://pypi.org/project/eyetrax/},
   repository   = {https://github.com/ck-zhang/EyeTrax},
+  doi          = {10.5281/zenodo.17188537},
   keywords     = {eye tracking, computer vision}
 }
 ```
 
+## Dense Grid Calibration
+
+For applications requiring finer spatial calibration, use the **dense grid** calibration method:
+
+```bash
+eyetrax-demo --calibration dense --grid-rows 7 --grid-cols 7
+```
+
+**Parameters:**
+- `--grid-rows` (int, default 5): Number of rows in the calibration grid
+- `--grid-cols` (int, default 5): Number of columns in the calibration grid
+- `--grid-margin` (float, default 0.10): Margin from screen edges (0.10 = 10%)
+
+**Pros:**
+- Improved spatial coverage and accuracy
+- Customizable grid density
+
+**Cons:**
+- Takes longer (more calibration points to collect)
+- May cause user fatigue with very large grids (recommend ≤10×10)
+
+**Example:** 5×5 grid with reduced margin:
+```bash
+eyetrax-demo --calibration dense --grid-rows 5 --grid-cols 5 --grid-margin 0.08
+
+
+
 **APA style**
 ```
-Zhang, C. (2025). EyeTrax (0.2.2) [Computer software]. https://pypi.org/project/eyetrax/ 
+Zhang, C. (2025). EyeTrax (0.2.2) [Computer software]. Zenodo. https://doi.org/10.5281/zenodo.17188537
 ```
