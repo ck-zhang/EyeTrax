@@ -11,12 +11,11 @@
 EyeTrax is a Python library that provides **webcam-based eye tracking**.
 Extract facial features, train a model and predict gaze with an easy‑to‑use interface.
 
-
 ## Features
 
 - Real‑time gaze estimation
 - Multiple calibration workflows
-- Optional filtering (Kalman / KDE)
+- Optional filtering (Kalman / Kalman+EMA / KDE)
 - Model persistence – save / load a trained `GazeEstimator`
 - Virtual-camera overlay that integrates with streaming software (e.g., OBS) via the bundled **`eyetrax-virtualcam`** CLI
 
@@ -51,9 +50,13 @@ Options
 
 | Flag | Values | Default | Description |
 |------|--------|---------|-------------|
-| `--filter` | `kalman`, `kde`, `none` | `none` | Smoothing filter |
+| `--filter` | `kalman`, `kalman_ema`, `kde`, `none` | `none` | Smoothing filter |
+| `--ema-alpha` *(kalman_ema only)* | *0–1* | `0.25` | EMA smoothing strength |
 | `--camera` | *int* | `0` | Physical webcam index |
-| `--calibration` | `9p`, `5p`, `lissajous` | `9p` | Calibration routine |
+| `--calibration` | `9p`, `5p`, `lissajous`, `dense` | `9p` | Calibration routine |
+| `--grid-rows` *(dense only)* | *int* | `5` | Calibration grid rows |
+| `--grid-cols` *(dense only)* | *int* | `5` | Calibration grid columns |
+| `--grid-margin` *(dense only)* | *float* | `0.10` | Margin ratio from edges |
 | `--background` *(demo only)* | *path* | — | Background image |
 | `--confidence` *(KDE only)* | *0–1* | `0.5` | Contour probability |
 
@@ -62,14 +65,11 @@ Options
 ```bash
 eyetrax-demo --filter kalman
 
-# Light smoothing (alpha = 0.25, default)
-eyetrax-demo --filter kalman_ema
+# Kalman + EMA smoothing (tune EMA strength)
+eyetrax-demo --filter kalman_ema --ema-alpha 0.5
 
-# More aggressive smoothing (alpha = 0.5)
-eyetrax-demo --filter kalman_ema --ema_alpha 0.5
-
-# Minimal Smoothing (alpha=0.1)
-eyetrax-demo --filter kalman_ema --ema-alpha 0.1
+# Dense grid calibration (higher spatial coverage)
+eyetrax-demo --calibration dense --grid-rows 7 --grid-cols 7
 ```
 
 ```bash
@@ -127,33 +127,6 @@ If you find EyeTrax useful, consider starring the repo or contributing. If you u
   keywords     = {eye tracking, computer vision}
 }
 ```
-
-## Dense Grid Calibration
-
-For applications requiring finer spatial calibration, use the **dense grid** calibration method:
-
-```bash
-eyetrax-demo --calibration dense --grid-rows 7 --grid-cols 7
-```
-
-**Parameters:**
-- `--grid-rows` (int, default 5): Number of rows in the calibration grid
-- `--grid-cols` (int, default 5): Number of columns in the calibration grid
-- `--grid-margin` (float, default 0.10): Margin from screen edges (0.10 = 10%)
-
-**Pros:**
-- Improved spatial coverage and accuracy
-- Customizable grid density
-
-**Cons:**
-- Takes longer (more calibration points to collect)
-- May cause user fatigue with very large grids (recommend ≤10×10)
-
-**Example:** 5×5 grid with reduced margin:
-```bash
-eyetrax-demo --calibration dense --grid-rows 5 --grid-cols 5 --grid-margin 0.08
-
-
 
 **APA style**
 ```

@@ -35,21 +35,6 @@ def make_kalman(
 
     return kf
 
-def make_kalman_ema(ema_alpha: float = 0.25) -> tuple[cv2.KalmanFilter, float]:
-    """
-    Factory for Klman + EMA hybrid filter.
-
-    Convernience function to create a Kalman filter + EMA alpha pair.
-
-    Args:
-        ema_alpha: EMA Smoothing factor in [0.0, 1.0] (default 0.25)
-
-    Returns:
-        Tuple of (cv2.KalmanFilter, ema_alpha)
-    """
-    return make_kalman(), ema_alpha
-
-
 
 from .base import BaseSmoother
 from .kalman import KalmanSmoother
@@ -59,7 +44,6 @@ from .noop import NoSmoother
 
 __all__ = [
     "make_kalman",
-    "make_kalman_ema",
     "BaseSmoother",
     "KalmanSmoother",
     "KalmanEMASmoother",
