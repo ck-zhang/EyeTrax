@@ -7,10 +7,11 @@ import numpy as np
 from eyetrax.calibration import (
     run_5_point_calibration,
     run_9_point_calibration,
+    run_dense_grid_calibration,
     run_lissajous_calibration,
 )
 from eyetrax.cli import parse_common_args
-from eyetrax.filters import KalmanSmoother, KDESmoother, NoSmoother, make_kalman
+from eyetrax.filters import KalmanSmoother, KalmanEMASmoother, KDESmoother, NoSmoother, make_kalman, make_kalman_ema
 from eyetrax.gaze import GazeEstimator
 from eyetrax.utils.draw import draw_cursor, make_thumbnail
 from eyetrax.utils.screen import get_screen_size
@@ -25,6 +26,7 @@ def run_demo():
     calibration_method = args.calibration
     background_path = args.background
     confidence_level = args.confidence
+    ema_alpha = args.ema_alpha
 
     gaze_estimator = GazeEstimator(model_name=args.model)
 
@@ -36,6 +38,12 @@ def run_demo():
             run_9_point_calibration(gaze_estimator, camera_index=camera_index)
         elif calibration_method == "5p":
             run_5_point_calibration(gaze_estimator, camera_index=camera_index)
+        elif calibration_method == "dense":
+            run_dense_grid_calibration(gaze_estimator,
+                                       rows = args.grid_rows,
+                                       cols = args.grid_cols,
+                                       margin_ratio = args.grid_margin,
+                                       camera_index = camera_index)
         else:
             run_lissajous_calibration(gaze_estimator, camera_index=camera_index)
 
@@ -45,6 +53,10 @@ def run_demo():
         kalman = make_kalman()
         smoother = KalmanSmoother(kalman)
         smoother.tune(gaze_estimator, camera_index=camera_index)
+    elif filter_method == "kalman_ema":
+        kalman_ema = make_kalman_ema(ema_alpha = ema_alpha)
+        smoother = KalmanEMASmoother(ema_alpha = ema_alpha)
+        smoother.tune(gaze_estimator, camera_index = camera_index)
     elif filter_method == "kde":
         kalman = None
         smoother = KDESmoother(screen_width, screen_height, confidence=confidence_level)

@@ -7,7 +7,7 @@ def parse_common_args():
 
     parser.add_argument(
         "--filter",
-        choices=["kalman", "kde", "none"],
+        choices=["kalman", "kde", "none", "kalman_ema"],
         default="none",
         help="Select the filter to apply to gaze estimation, options are 'kalman', 'kde', or 'none'",
     )
@@ -19,9 +19,27 @@ def parse_common_args():
     )
     parser.add_argument(
         "--calibration",
-        choices=["9p", "5p", "lissajous"],
+        choices=["9p", "5p", "lissajous", "dense"],
         default="9p",
-        help="Calibration method for gaze estimation, options are '9p', '5p', or 'lissajous'",
+        help="Calibration method for gaze estimation, options are '9p', '5p', or 'lissajous', or 'dense'",
+    )
+    parser.add_argument(
+        "--grid-rows",
+        type = int,
+        default = 5,
+        help = "Number of rows for dense grid calibration (default 5)",
+    )
+    parser.add_argument(
+        "--grid-cols",
+        type = int,
+        default = 5,
+        help = "Number of columns for dense grid calibration ( default 5) "
+    )
+    parser.add_argument(
+        "--grid_margin",
+        type = float,
+        default = 0.10,
+        help = "Margin ratio for dense grid calibration (default 0.10 =10%)"
     )
     parser.add_argument(
         "--background",
@@ -45,6 +63,12 @@ def parse_common_args():
         type=str,
         default=None,
         help="Path to a previously-trained gaze model",
+    )
+    parser.add_argument(
+        "--ema-alpha",
+        type=float,
+        default=0.25,
+        help="Exponential Moving Average Alpha value",
     )
 
     return parser.parse_args()
