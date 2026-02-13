@@ -61,6 +61,15 @@ Options
 
 ```bash
 eyetrax-demo --filter kalman
+
+# Light smoothing (alpha = 0.25, default)
+eyetrax-demo --filter kalman_ema
+
+# More aggressive smoothing (alpha = 0.5)
+eyetrax-demo --filter kalman_ema --ema_alpha 0.5
+
+# Minimal Smoothing (alpha=0.1)
+eyetrax-demo --filter kalman_ema --ema-alpha 0.1
 ```
 
 ```bash

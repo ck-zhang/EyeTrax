@@ -11,7 +11,7 @@ from eyetrax.calibration import (
     run_lissajous_calibration,
 )
 from eyetrax.cli import parse_common_args
-from eyetrax.filters import KalmanSmoother, KDESmoother, NoSmoother, make_kalman
+from eyetrax.filters import KalmanSmoother, KDESmoother, NoSmoother, make_kalman, make_kalman_ema, KalmanEMASmoother
 from eyetrax.gaze import GazeEstimator
 from eyetrax.utils.draw import draw_cursor
 from eyetrax.utils.screen import get_screen_size
@@ -50,6 +50,10 @@ def run_virtualcam():
         kalman = make_kalman()
         smoother = KalmanSmoother(kalman)
         smoother.tune(gaze_estimator, camera_index=camera_index)
+    elif filter_method == "kalman_ema":
+        kalman_ema = make_kalman_ema()
+        smoother = KalmanEMASmoother(kalman_ema)
+        smoother.tune(gaze_estimator, camera_index = camera_index)
     elif filter_method == "kde":
         kalman = None
         smoother = KDESmoother(screen_width, screen_height, confidence=confidence_level)
