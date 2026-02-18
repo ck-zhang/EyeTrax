@@ -27,7 +27,7 @@ def _create_face_mesh():
         VisionRunningMode = vision.RunningMode
         options = FaceLandmarkerOptions(
             base_options = BaseOptions(
-                model_asset_path = r"C:\Users\vvams\PycharmProjects\dot_focus_app_emi\models\mediapipe\face_landmarker.task"
+                model_asset_path = r".\task_model\face_landmarker.task"
 
             ),
             running_mode=VisionRunningMode.IMAGE,
