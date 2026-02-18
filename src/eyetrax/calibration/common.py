@@ -93,6 +93,39 @@ def _serpentine_order(
     return ordered
 
 
+def compute_grid_points_from_shape(
+    rows: int,
+    cols: int,
+    sw: int,
+    sh: int,
+    margin_ratio: float = 0.10,
+    order: str = "default",
+) -> list[tuple[int, int]]:
+    """
+    Generate (x, y) pixel coordinates for a rows x cols grid.
+
+    `order` controls traversal:
+    - "default": row-major
+    - "serpentine": snake pattern (reduces large jumps between rows)
+    """
+    if rows <= 0 or cols <= 0:
+        raise ValueError(f"rows and cols must be > 0 (got rows={rows}, cols={cols})")
+    if not 0.0 <= margin_ratio < 0.5:
+        raise ValueError(f"margin_ratio must be in [0.0, 0.5) (got {margin_ratio})")
+
+    if order == "default":
+        indices = [(r, c) for r in range(rows) for c in range(cols)]
+    elif order == "serpentine":
+        indices = []
+        for r in range(rows):
+            cols_range = range(cols) if r % 2 == 0 else range(cols - 1, -1, -1)
+            indices.extend((r, c) for c in cols_range)
+    else:
+        raise ValueError(f"unknown order '{order}' (expected 'default' or 'serpentine')")
+
+    return compute_grid_points(indices, sw, sh, margin_ratio)
+
+
 def wait_for_face_and_countdown(cap, gaze_estimator, sw, sh, dur: int = 2) -> bool:
     """
     Waits for a face to be detected (not blinking), then shows a countdown ellipse

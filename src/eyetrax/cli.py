@@ -7,9 +7,15 @@ def parse_common_args():
 
     parser.add_argument(
         "--filter",
-        choices=["kalman", "kde", "none", "kalman_ema"],
+        choices=["kalman", "kalman_ema", "kde", "none"],
         default="none",
-        help="Select the filter to apply to gaze estimation, options are 'kalman', 'kde', or 'none'",
+        help="Select the filter to apply to gaze estimation",
+    )
+    parser.add_argument(
+        "--ema-alpha",
+        type=float,
+        default=0.25,
+        help="EMA smoothing strength for kalman_ema (0 disables EMA, closer to 1 is smoother)",
     )
     parser.add_argument(
         "--camera",
@@ -21,25 +27,25 @@ def parse_common_args():
         "--calibration",
         choices=["9p", "5p", "lissajous", "dense"],
         default="9p",
-        help="Calibration method for gaze estimation, options are '9p', '5p', or 'lissajous', or 'dense'",
+        help="Calibration method for gaze estimation",
     )
     parser.add_argument(
         "--grid-rows",
-        type = int,
-        default = 5,
-        help = "Number of rows for dense grid calibration (default 5)",
+        type=int,
+        default=5,
+        help="Grid rows for dense calibration (default 5)",
     )
     parser.add_argument(
         "--grid-cols",
-        type = int,
-        default = 5,
-        help = "Number of columns for dense grid calibration ( default 5) "
+        type=int,
+        default=5,
+        help="Grid columns for dense calibration (default 5)",
     )
     parser.add_argument(
-        "--grid_margin",
-        type = float,
-        default = 0.10,
-        help = "Margin ratio for dense grid calibration (default 0.10 =10%)"
+        "--grid-margin",
+        type=float,
+        default=0.10,
+        help="Margin ratio for dense calibration (default 0.10 = 10%)",
     )
     parser.add_argument(
         "--background",
@@ -64,11 +70,6 @@ def parse_common_args():
         default=None,
         help="Path to a previously-trained gaze model",
     )
-    parser.add_argument(
-        "--ema-alpha",
-        type=float,
-        default=0.25,
-        help="Exponential Moving Average Alpha value",
-    )
 
     return parser.parse_args()
+

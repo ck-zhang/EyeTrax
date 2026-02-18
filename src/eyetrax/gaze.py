@@ -4,11 +4,57 @@ from collections import deque
 from pathlib import Path
 
 import cv2
-import mediapipe as mp
 import numpy as np
 
 from eyetrax.constants import LEFT_EYE_INDICES, MUTUAL_INDICES, RIGHT_EYE_INDICES
 from eyetrax.models import BaseModel, create_model
+
+
+def _create_face_mesh():
+    try:
+        import mediapipe  # type: ignore
+    except Exception as e:  # pragma: no cover
+        raise ImportError(
+            "Failed to import mediapipe, which is required for face landmarks. "
+            "If you're seeing NumPy 2.x / TensorFlow import errors, install with "
+            "`numpy<2` (e.g. `pip install 'numpy<2'`) and reinstall eyetrax."
+        ) from e
+
+    face_mesh_cls = None
+
+    # Old(er) API: `import mediapipe as mp; mp.solutions.face_mesh.FaceMesh`
+    try:
+        face_mesh_cls = mediapipe.solutions.face_mesh.FaceMesh  # type: ignore[attr-defined]
+    except Exception:
+        pass
+
+    # Some builds expose `mediapipe.solutions` as a submodule but don't attach it to `mediapipe`.
+    if face_mesh_cls is None:
+        try:
+            import mediapipe.solutions as mp_solutions  # type: ignore
+
+            face_mesh_cls = mp_solutions.face_mesh.FaceMesh
+        except Exception:
+            pass
+
+    # Fallback: `mediapipe.python.solutions`
+    if face_mesh_cls is None:
+        try:
+            from mediapipe.python.solutions.face_mesh import FaceMesh  # type: ignore
+
+            face_mesh_cls = FaceMesh
+        except Exception as e:  # pragma: no cover
+            raise ImportError(
+                "mediapipe is installed, but FaceMesh could not be imported. "
+                "Install a mediapipe build that includes the face_mesh solution."
+            ) from e
+
+    return face_mesh_cls(
+        static_image_mode=False,
+        max_num_faces=1,
+        refine_landmarks=True,
+        min_detection_confidence=0.5,
+    )
 
 
 class GazeEstimator:
@@ -20,12 +66,7 @@ class GazeEstimator:
         blink_threshold_ratio: float = 0.8,
         min_history: int = 15,
     ):
-        self.face_mesh = mp.solutions.face_mesh.FaceMesh(
-            static_image_mode=False,
-            max_num_faces=1,
-            refine_landmarks=True,
-            min_detection_confidence=0.5,
-        )
+        self.face_mesh = _create_face_mesh()
         self.model: BaseModel = create_model(model_name, **(model_kwargs or {}))
 
         self._ear_history = deque(maxlen=ear_history_len)
