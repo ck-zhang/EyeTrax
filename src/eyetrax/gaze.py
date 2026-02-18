@@ -5,57 +5,43 @@ from pathlib import Path
 
 import cv2
 import numpy as np
+import mediapipe as mp
+from mediapipe.tasks import python
+from mediapipe.tasks.python import vision
+from mediapipe import Image, ImageFormat
+
 
 from eyetrax.constants import LEFT_EYE_INDICES, MUTUAL_INDICES, RIGHT_EYE_INDICES
 from eyetrax.models import BaseModel, create_model
 
 
 def _create_face_mesh():
+    """
+    Tasks API is unified across all mediapipe solutions
+    """
     try:
-        import mediapipe  # type: ignore
+        # Create FaceLandmarker with Tasks API
+        BaseOptions = python.BaseOptions
+        FaceLandmarker = vision.FaceLandmarker
+        FaceLandmarkerOptions = vision.FaceLandmarkerOptions
+        VisionRunningMode = vision.RunningMode
+        options = FaceLandmarkerOptions(
+            base_options = BaseOptions(
+                model_asset_path = r"C:\Users\vvams\PycharmProjects\dot_focus_app_emi\models\mediapipe\face_landmarker.task"
+
+            ),
+            running_mode=VisionRunningMode.IMAGE,
+            num_faces=1,
+            min_face_detection_confidence=0.5,
+            min_tracking_confidence=0.5
+        )
+        return FaceLandmarker.create_from_options(options)
     except Exception as e:  # pragma: no cover
         raise ImportError(
             "Failed to import mediapipe, which is required for face landmarks. "
             "If you're seeing NumPy 2.x / TensorFlow import errors, install with "
             "`numpy<2` (e.g. `pip install 'numpy<2'`) and reinstall eyetrax."
         ) from e
-
-    face_mesh_cls = None
-
-    # Old(er) API: `import mediapipe as mp; mp.solutions.face_mesh.FaceMesh`
-    try:
-        face_mesh_cls = mediapipe.solutions.face_mesh.FaceMesh  # type: ignore[attr-defined]
-    except Exception:
-        pass
-
-    # Some builds expose `mediapipe.solutions` as a submodule but don't attach it to `mediapipe`.
-    if face_mesh_cls is None:
-        try:
-            import mediapipe.solutions as mp_solutions  # type: ignore
-
-            face_mesh_cls = mp_solutions.face_mesh.FaceMesh
-        except Exception:
-            pass
-
-    # Fallback: `mediapipe.python.solutions`
-    if face_mesh_cls is None:
-        try:
-            from mediapipe.python.solutions.face_mesh import FaceMesh  # type: ignore
-
-            face_mesh_cls = FaceMesh
-        except Exception as e:  # pragma: no cover
-            raise ImportError(
-                "mediapipe is installed, but FaceMesh could not be imported. "
-                "Install a mediapipe build that includes the face_mesh solution."
-            ) from e
-
-    return face_mesh_cls(
-        static_image_mode=False,
-        max_num_faces=1,
-        refine_landmarks=True,
-        min_detection_confidence=0.5,
-    )
-
 
 class GazeEstimator:
     def __init__(
@@ -66,7 +52,7 @@ class GazeEstimator:
         blink_threshold_ratio: float = 0.8,
         min_history: int = 15,
     ):
-        self.face_mesh = _create_face_mesh()
+        self.face_landmarker = _create_face_mesh()
         self.model: BaseModel = create_model(model_name, **(model_kwargs or {}))
 
         self._ear_history = deque(maxlen=ear_history_len)
@@ -79,21 +65,33 @@ class GazeEstimator:
         Normalization with nose tip as anchor
         """
         image_rgb = cv2.cvtColor(image, cv2.COLOR_BGR2RGB)
-        results = self.face_mesh.process(image_rgb)
+        mp_image = Image(image_format = ImageFormat.SRGB ,data = image_rgb)
+        # Detect face landmarks with Tasks API
+        detection_result = self.face_landmarker.detect(mp_image)
 
-        if not results.multi_face_landmarks:
+        # check if face present
+        if not detection_result.face_landmarks:
             return None, False
 
-        face_landmarks = results.multi_face_landmarks[0]
-        landmarks = face_landmarks.landmark
+        # Extract landmarks from first face detection
+        landmarks = detection_result.face_landmarks[0]
 
+        # Convert to numpy array
         all_points = np.array(
-            [(lm.x, lm.y, lm.z) for lm in landmarks], dtype=np.float32
+            [(lm.x, lm.y, lm.z) for lm in landmarks]
         )
+
+        # reference points for normalization
         nose_anchor = all_points[4]
         left_corner = all_points[33]
         right_corner = all_points[263]
         top_of_head = all_points[10]
+
+        shifted_points = all_points - nose_anchor
+
+        all_points = np.array(
+            [(lm.x, lm.y, lm.z) for lm in landmarks], dtype=np.float32
+        )
 
         shifted_points = all_points - nose_anchor
         x_axis = right_corner - left_corner
