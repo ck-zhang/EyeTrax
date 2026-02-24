@@ -5,6 +5,27 @@ from contextlib import contextmanager
 import cv2
 
 
+def open_camera(index: int = 0) -> cv2.VideoCapture:
+    """
+    Open a camera by index.
+
+    Compatibility fallback: if camera 0 fails to open, try camera 1.
+    """
+    cap = cv2.VideoCapture(index)
+    if cap.isOpened():
+        return cap
+
+    cap.release()
+    if index == 0:
+        cap = cv2.VideoCapture(1)
+        if cap.isOpened():
+            return cap
+        cap.release()
+        raise RuntimeError("cannot open camera 0 (fallback to camera 1 also failed)")
+
+    raise RuntimeError(f"cannot open camera {index}")
+
+
 @contextmanager
 def fullscreen(name: str):
     """
@@ -23,9 +44,7 @@ def camera(index: int = 0):
     """
     Context manager returning an opened VideoCapture
     """
-    cap = cv2.VideoCapture(index)
-    if not cap.isOpened():
-        raise RuntimeError(f"cannot open camera {index}")
+    cap = open_camera(index)
     try:
         yield cap
     finally:

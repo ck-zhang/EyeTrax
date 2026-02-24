@@ -7,6 +7,7 @@ import cv2
 import numpy as np
 
 from eyetrax.utils.screen import get_screen_size
+from eyetrax.utils.video import open_camera
 
 from . import make_kalman
 from .base import BaseSmoother
@@ -68,7 +69,7 @@ class KalmanSmoother(BaseSmoother):
             "Fine Tuning", cv2.WND_PROP_FULLSCREEN, cv2.WINDOW_FULLSCREEN
         )
 
-        cap = cv2.VideoCapture(camera_index)
+        cap = open_camera(camera_index)
         gaze_positions = []
 
         while points:

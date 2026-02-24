@@ -7,6 +7,7 @@ from eyetrax.calibration.common import (
     wait_for_face_and_countdown,
 )
 from eyetrax.utils.screen import get_screen_size
+from eyetrax.utils.video import open_camera
 
 
 def run_5_point_calibration(gaze_estimator, camera_index: int = 0):
@@ -15,7 +16,7 @@ def run_5_point_calibration(gaze_estimator, camera_index: int = 0):
     """
     sw, sh = get_screen_size()
 
-    cap = cv2.VideoCapture(camera_index)
+    cap = open_camera(camera_index)
     if not wait_for_face_and_countdown(cap, gaze_estimator, sw, sh, 2):
         cap.release()
         cv2.destroyAllWindows()
